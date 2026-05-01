@@ -547,6 +547,10 @@
   }
 
 </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#c9a84c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Kal">
 </head>
 <body>
 
@@ -1011,6 +1015,11 @@ document.getElementById('license-input').addEventListener('keydown', function(e)
   }
 })();
 
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
