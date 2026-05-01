@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e11;
+    --surface: #1a1820;
+    --surface2: #221f2a;
+    --border: #2e2a38;
+    --accent: #c9a84c;
+    --accent2: #e8c97e;
+    --text: #f0ece8;
+    --muted: #7a7385;
+    --green: #4caf7d;
+    --red: #e05c5c;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px;
+    background-image: radial-gradient(ellipse at 20% 10%, rgba(201,168,76,0.06) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(76,175,125,0.04) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--accent2);
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  @media(min-width: 700px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .notepad { grid-column: 1 / -1; }
+    .history-card { grid-column: 1 / -1; }
+  }
+
+  /* ── HISTORY SPLIT ── */
+  .history-split {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+  }
+
+  .history-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .history-col-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+    font-weight: 700;
+  }
+
+  .history-middle-divider {
+    width: 1px;
+    background: linear-gradient(180deg, transparent, var(--border), var(--border), transparent);
+    align-self: stretch;
+    margin: 0 20px;
+    flex-shrink: 0;
+  }
+
+  @media(max-width: 600px) {
+    .history-split { flex-direction: column; gap: 24px; }
+    .history-middle-divider { width: 100%; height: 1px; margin: 0; background: linear-gradient(90deg, transparent, var(--border), transparent); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent2);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title span { font-size: 1.1rem; }
+
+  /* ── FINANCE ── */
+  .finance-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    text-align: right;
+  }
+
+  .finance-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .finance-total {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--accent2);
+  }
+
+  .finance-total.negative { color: var(--red); }
+
+  .finance-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .fin-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .fin-input:focus { border-color: var(--accent); }
+  .fin-input::placeholder { color: var(--muted); }
+
+  .fin-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0f0e11;
+  }
+  .btn-accent:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .entry-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 12px;
+  }
+
+  .entry-list::-webkit-scrollbar { width: 4px; }
+  .entry-list::-webkit-scrollbar-track { background: transparent; }
+  .entry-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .entry-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    animation: slideIn 0.2s ease;
+  }
+
+  .entry-item .entry-name { color: var(--text); flex: 1; }
+  .entry-item .entry-val { font-weight: 500; margin-left: 8px; }
+  .entry-item .entry-val.income { color: var(--green); }
+  .entry-item .entry-val.expense { color: var(--red); }
+  .entry-item .del-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1rem; padding: 0 0 0 8px;
+    transition: color 0.2s;
+  }
+  .entry-item .del-btn:hover { color: var(--red); }
+
+  /* ── TASKS ── */
+  .task-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .task-list::-webkit-scrollbar { width: 4px; }
+  .task-list::-webkit-scrollbar-track { background: transparent; }
+  .task-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    animation: slideIn 0.2s ease;
+  }
+
+  .task-item.done {
+    opacity: 0.5;
+    border-color: transparent;
+  }
+
+  .task-item.done .task-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .task-checkbox {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.75rem;
+    color: transparent;
+  }
+
+  .task-item.done .task-checkbox {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .task-text {
+    flex: 1;
+    font-size: 0.88rem;
+    line-height: 1.4;
+  }
+
+  .task-del {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer;
+    font-size: 1rem; transition: color 0.2s;
+    padding: 0;
+  }
+  .task-del:hover { color: var(--red); }
+
+  .tasks-summary {
+    margin-top: 14px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ── NOTEPAD ── */
+  .notepad textarea {
+    width: 100%;
+    min-height: 150px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .notepad textarea:focus { border-color: var(--accent); }
+  .notepad textarea::placeholder { color: var(--muted); }
+
+  .notepad-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .notepad-saved {
+    font-size: 0.75rem;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .notepad-saved.show { opacity: 1; }
+
+  /* ── UTILS ── */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 20px 0;
+  }
+
+  .tag-income { background: rgba(76,175,125,0.12); color: var(--green); border-radius: 4px; padding: 1px 6px; font-size: 0.7rem; }
+  .tag-expense { background: rgba(224,92,92,0.12); color: var(--red); border-radius: 4px; padding: 1px 6px; font-size: 0.7rem; }
+
+  /* ── HISTORY ── */
+  .history-card { grid-column: 1 / -1; }
+
+  .history-day-block { margin-bottom: 20px; }
+
+  .history-day-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .history-day-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.88rem;
+    color: var(--accent2);
+    white-space: nowrap;
+  }
+
+  .history-divider {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .history-day-total {
+    font-size: 0.78rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .history-day-total.pos { color: var(--green); }
+  .history-day-total.neg { color: var(--red); }
+
+  .history-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    border-left: 2px solid transparent;
+  }
+  .history-entry.inc { border-left-color: var(--green); }
+  .history-entry.exp { border-left-color: var(--red); }
+
+  .history-time {
+    color: var(--muted);
+    font-size: 0.72rem;
+    white-space: nowrap;
+    min-width: 42px;
+  }
+
+  .history-entry-name { flex: 1; color: var(--text); }
+
+  .history-entry-val { font-weight: 500; }
+  .history-entry-val.inc { color: var(--green); }
+  .history-entry-val.exp { color: var(--red); }
+
+  @media(min-width: 700px) {
+    .history-card { grid-column: 1 / -1; }
+  }
+
+  /* ── LOGIN OVERLAY ── */
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    background: #0f0e11;
+    background-image: radial-gradient(ellipse at 20% 10%, rgba(201,168,76,0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(76,175,125,0.05) 0%, transparent 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 24px;
+  }
+
+  #login-box {
+    background: #1a1820;
+    border: 1px solid #2e2a38;
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+  }
+
+  #login-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    color: #e8c97e;
+    margin-bottom: 6px;
+  }
+
+  #login-sub {
+    font-size: 0.8rem;
+    color: #7a7385;
+    margin-bottom: 32px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  #license-input {
+    width: 100%;
+    background: #221f2a;
+    border: 1px solid #2e2a38;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #f0ece8;
+    font-family: 'DM Sans', monospace;
+    font-size: 0.95rem;
+    outline: none;
+    text-align: center;
+    letter-spacing: 1px;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+
+  #license-input:focus { border-color: #c9a84c; }
+  #license-input::placeholder { color: #7a7385; letter-spacing: 0; font-size: 0.85rem; }
+
+  #login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #c9a84c, #e8c97e);
+    color: #0f0e11;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  #login-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  #login-error {
+    margin-top: 14px;
+    font-size: 0.8rem;
+    color: #e05c5c;
+    min-height: 18px;
+    transition: opacity 0.2s;
+  }
+
+  #login-footer {
+    margin-top: 28px;
+    font-size: 0.72rem;
+    color: #7a7385;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div id="login-box">
+    <div id="login-logo">✦ Kal</div>
+    <div id="login-sub">Insira sua chave de licença para continuar</div>
+    <input id="license-input" type="text" placeholder="Cole sua chave do Gumroad aqui" maxlength="100" autocomplete="off" spellcheck="false" />
+    <button id="login-btn" onclick="doLogin()">Entrar</button>
+    <div id="login-error"></div>
+    <div id="login-footer">Licença adquirida no Gumroad · Suporte: contato via loja</div>
+  </div>
+</div>
+
+
+<header>
+  <h1>✦ Kal</h1>
+  <p id="date-display"></p>
+</header>
+
+<div class="grid">
+
+  <!-- FINANCE CARD -->
+  <div class="card">
+    <div class="card-title"><span>💰</span> Gastos do Dia</div>
+
+    <div class="finance-display">
+      <div class="finance-label">Saldo do dia</div>
+      <div class="finance-total" id="saldo-total">R$ 0,00</div>
+    </div>
+
+    <div class="finance-row">
+      <input class="fin-input" id="fin-desc" placeholder="Descrição (ex: almoço)" />
+      <select class="fin-select" id="fin-type">
+        <option value="income">+ Entrada</option>
+        <option value="expense">− Saída</option>
+      </select>
+    </div>
+    <div class="finance-row">
+      <input class="fin-input" id="fin-val" type="number" placeholder="Valor (R$)" step="0.01" />
+      <button class="btn btn-accent" onclick="addEntry()">Adicionar</button>
+    </div>
+
+    <div class="entry-list" id="entry-list">
+      <div class="empty-state">Nenhum lançamento ainda</div>
+    </div>
+
+    <div style="text-align:right; margin-top: 10px;">
+      <button class="btn btn-ghost" onclick="clearEntries()">Limpar tudo</button>
+    </div>
+  </div>
+
+  <!-- TASKS CARD -->
+  <div class="card">
+    <div class="card-title"><span>✅</span> Tarefas</div>
+
+    <div class="task-input-row">
+      <input class="fin-input" id="task-input" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter') addTask()" />
+      <button class="btn btn-accent" onclick="addTask()">+</button>
+    </div>
+
+    <div class="task-list" id="task-list">
+      <div class="empty-state">Nenhuma tarefa ainda</div>
+    </div>
+
+    <div class="tasks-summary" id="tasks-summary"></div>
+  </div>
+
+  <!-- NOTEPAD CARD -->
+  <div class="card notepad">
+    <div class="card-title"><span>📝</span> Bloco de Notas</div>
+    <textarea id="notepad" placeholder="Anote aqui o que precisar guardar ou fazer depois..."></textarea>
+    <div class="notepad-actions">
+      <span class="notepad-saved" id="saved-msg">✓ Salvo</span>
+      <div style="display:flex; gap: 8px;">
+        <button class="btn btn-ghost" onclick="clearNotes()">Limpar</button>
+        <button class="btn btn-accent" onclick="saveNotes()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY CARD -->
+  <div class="card history-card">
+    <div class="card-title"><span>🗂️</span> Histórico</div>
+    <div class="history-split">
+
+      <!-- ESQUERDA: Finanças -->
+      <div class="history-col">
+        <div class="history-col-title">💰 Gastos</div>
+        <div id="history-list">
+          <div class="empty-state">Nenhum lançamento ainda</div>
+        </div>
+        <div style="text-align:right; margin-top: 14px;">
+          <button class="btn btn-ghost" onclick="clearHistory()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="history-middle-divider"></div>
+
+      <!-- DIREITA: Tarefas -->
+      <div class="history-col">
+        <div class="history-col-title">✅ Tarefas</div>
+        <div id="task-history-list">
+          <div class="empty-state">Nenhuma tarefa no histórico ainda</div>
+        </div>
+        <div style="text-align:right; margin-top: 14px;">
+          <button class="btn btn-ghost" onclick="clearTaskHistory()">Limpar</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATE ──
+const dateEl = document.getElementById('date-display');
+const now = new Date();
+const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+dateEl.textContent = now.toLocaleDateString('pt-BR', opts);
+
+// ── FINANCE ──
+let entries = JSON.parse(localStorage.getItem('kal_entries') || '[]');
+let history = JSON.parse(localStorage.getItem('kal_history') || '[]');
+
+function saveEntries() { localStorage.setItem('kal_entries', JSON.stringify(entries)); }
+function saveHistory() { localStorage.setItem('kal_history', JSON.stringify(history)); }
+
+function formatBRL(val) {
+  return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function todayKey() {
+  const d = new Date();
+  return d.toLocaleDateString('pt-BR');
+}
+
+function nowTime() {
+  return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderEntries() {
+  const list = document.getElementById('entry-list');
+  const totalEl = document.getElementById('saldo-total');
+
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nenhum lançamento ainda</div>';
+    totalEl.textContent = 'R$ 0,00';
+    totalEl.className = 'finance-total';
+    return;
+  }
+
+  let total = 0;
+  list.innerHTML = entries.map((e, i) => {
+    total += e.type === 'income' ? e.val : -e.val;
+    const tag = e.type === 'income'
+      ? '<span class="tag-income">entrada</span>'
+      : '<span class="tag-expense">saída</span>';
+    const cls = e.type === 'income' ? 'income' : 'expense';
+    const sign = e.type === 'income' ? '+' : '−';
+    return `<div class="entry-item">
+      <span class="entry-name">${e.desc}</span>
+      ${tag}
+      <span class="entry-val ${cls}">${sign} ${formatBRL(e.val)}</span>
+      <button class="del-btn" onclick="deleteEntry(${i})">×</button>
+    </div>`;
+  }).join('');
+
+  totalEl.textContent = formatBRL(total);
+  totalEl.className = 'finance-total' + (total < 0 ? ' negative' : '');
+}
+
+function addEntry() {
+  const desc = document.getElementById('fin-desc').value.trim();
+  const val = parseFloat(document.getElementById('fin-val').value);
+  const type = document.getElementById('fin-type').value;
+  if (!desc || isNaN(val) || val <= 0) return;
+
+  const entry = { desc, val, type, date: todayKey(), time: nowTime() };
+  entries.push(entry);
+  saveEntries();
+
+  // Add to history
+  history.push(entry);
+  saveHistory();
+  renderHistory();
+
+  renderEntries();
+  document.getElementById('fin-desc').value = '';
+  document.getElementById('fin-val').value = '';
+}
+
+function deleteEntry(i) {
+  entries.splice(i, 1);
+  saveEntries();
+  renderEntries();
+}
+
+function clearEntries() {
+  if (!confirm('Limpar lançamentos do dia? O histórico será mantido.')) return;
+  entries = [];
+  saveEntries();
+  renderEntries();
+}
+
+function clearHistory() {
+  if (!confirm('Limpar todo o histórico permanentemente?')) return;
+  history = [];
+  saveHistory();
+  renderHistory();
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (history.length === 0) {
+    container.innerHTML = '<div class="empty-state">Nenhum lançamento no histórico ainda</div>';
+    return;
+  }
+
+  // Group by date
+  const byDay = {};
+  history.forEach(e => {
+    if (!byDay[e.date]) byDay[e.date] = [];
+    byDay[e.date].push(e);
+  });
+
+  // Sort days descending (most recent first)
+  const days = Object.keys(byDay).sort((a, b) => {
+    const parse = s => s.split('/').reverse().join('-');
+    return parse(b).localeCompare(parse(a));
+  });
+
+  container.innerHTML = days.map(day => {
+    const items = byDay[day];
+    let dayTotal = 0;
+    items.forEach(e => { dayTotal += e.type === 'income' ? e.val : -e.val; });
+    const totalCls = dayTotal >= 0 ? 'pos' : 'neg';
+    const totalSign = dayTotal >= 0 ? '+' : '';
+
+    const rows = items.map(e => {
+      const cls = e.type === 'income' ? 'inc' : 'exp';
+      const sign = e.type === 'income' ? '+' : '−';
+      return `<div class="history-entry ${cls}">
+        <span class="history-time">${e.time || '--:--'}</span>
+        <span class="history-entry-name">${e.desc}</span>
+        <span class="tag-${e.type === 'income' ? 'income' : 'expense'}">${e.type === 'income' ? 'entrada' : 'saída'}</span>
+        <span class="history-entry-val ${cls}">${sign} ${formatBRL(e.val)}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="history-day-block">
+      <div class="history-day-header">
+        <span class="history-day-label">📅 ${day}</span>
+        <div class="history-divider"></div>
+        <span class="history-day-total ${totalCls}">Saldo: ${totalSign}${formatBRL(dayTotal)}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+
+renderEntries();
+renderHistory();
+
+// ── TASKS ──
+let tasks = JSON.parse(localStorage.getItem('kal_tasks') || '[]');
+let taskHistory = JSON.parse(localStorage.getItem('kal_task_history') || '[]');
+
+function saveTasks() { localStorage.setItem('kal_tasks', JSON.stringify(tasks)); }
+function saveTaskHistory() { localStorage.setItem('kal_task_history', JSON.stringify(taskHistory)); }
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  const summary = document.getElementById('tasks-summary');
+
+  if (tasks.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nenhuma tarefa ainda</div>';
+    summary.textContent = '';
+    return;
+  }
+
+  const done = tasks.filter(t => t.done).length;
+  summary.textContent = `${done} de ${tasks.length} concluída${tasks.length > 1 ? 's' : ''}`;
+
+  list.innerHTML = tasks.map((t, i) => `
+    <div class="task-item ${t.done ? 'done' : ''}">
+      <div class="task-checkbox" onclick="toggleTask(${i})">${t.done ? '✓' : ''}</div>
+      <span class="task-text">${t.text}</span>
+      <button class="task-del" onclick="deleteTask(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const t = { text, done: false, date: todayKey(), time: nowTime() };
+  tasks.push(t);
+  saveTasks();
+
+  // add to task history
+  taskHistory.push({ ...t, action: 'criada' });
+  saveTaskHistory();
+  renderTaskHistory();
+
+  renderTasks();
+  input.value = '';
+}
+
+function toggleTask(i) {
+  tasks[i].done = !tasks[i].done;
+  const t = tasks[i];
+  saveTasks();
+
+  // log status change to history
+  taskHistory.push({ text: t.text, date: todayKey(), time: nowTime(), action: t.done ? 'concluída' : 'reaberta' });
+  saveTaskHistory();
+  renderTaskHistory();
+
+  renderTasks();
+}
+
+function deleteTask(i) {
+  tasks.splice(i, 1);
+  saveTasks();
+  renderTasks();
+}
+
+function clearTaskHistory() {
+  if (!confirm('Limpar todo o histórico de tarefas?')) return;
+  taskHistory = [];
+  saveTaskHistory();
+  renderTaskHistory();
+}
+
+function renderTaskHistory() {
+  const container = document.getElementById('task-history-list');
+  if (taskHistory.length === 0) {
+    container.innerHTML = '<div class="empty-state">Nenhuma tarefa no histórico ainda</div>';
+    return;
+  }
+
+  // Group by date
+  const byDay = {};
+  taskHistory.forEach(e => {
+    if (!byDay[e.date]) byDay[e.date] = [];
+    byDay[e.date].push(e);
+  });
+
+  const days = Object.keys(byDay).sort((a, b) => {
+    const parse = s => s.split('/').reverse().join('-');
+    return parse(b).localeCompare(parse(a));
+  });
+
+  const actionIcon = { 'criada': '＋', 'concluída': '✓', 'reaberta': '↩' };
+  const actionColor = { 'criada': 'var(--muted)', 'concluída': 'var(--green)', 'reaberta': 'var(--accent)' };
+
+  container.innerHTML = days.map(day => {
+    const items = byDay[day];
+    const done = items.filter(t => t.action === 'concluída').length;
+
+    const rows = items.map(e => {
+      const icon = actionIcon[e.action] || '•';
+      const color = actionColor[e.action] || 'var(--muted)';
+      return `<div class="history-entry" style="border-left-color:${color}">
+        <span class="history-time">${e.time || '--:--'}</span>
+        <span class="history-entry-name">${e.text}</span>
+        <span style="font-size:0.72rem;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,0.05);color:${color}">${e.action}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="history-day-block">
+      <div class="history-day-header">
+        <span class="history-day-label">📅 ${day}</span>
+        <div class="history-divider"></div>
+        <span class="history-day-total pos">${done} concluída${done !== 1 ? 's' : ''}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+
+renderTasks();
+renderTaskHistory();
+
+// ── NOTEPAD ──
+const notepad = document.getElementById('notepad');
+notepad.value = localStorage.getItem('kal_notes') || '';
+
+let autoSaveTimer;
+notepad.addEventListener('input', () => {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    localStorage.setItem('kal_notes', notepad.value);
+    showSaved();
+  }, 1000);
+});
+
+function saveNotes() {
+  localStorage.setItem('kal_notes', notepad.value);
+  showSaved();
+}
+
+function clearNotes() {
+  if (!confirm('Limpar o bloco de notas?')) return;
+  notepad.value = '';
+  localStorage.removeItem('kal_notes');
+}
+
+function showSaved() {
+  const msg = document.getElementById('saved-msg');
+  msg.classList.add('show');
+  setTimeout(() => msg.classList.remove('show'), 2000);
+}
+
+
+// ── LICENSE CHECK ──
+const VALID_KEYS = [
+  "C6341421-9FB24460-86D6E539-3647B9C4"
+  // Adicione novas chaves aqui conforme as vendas
+];
+
+function normalizeKey(k) {
+  return k.trim().toUpperCase();
+}
+
+function doLogin() {
+  const input = document.getElementById('license-input');
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  const key = normalizeKey(input.value);
+
+  if (!key) {
+    err.textContent = 'Digite sua chave de licença.';
+    return;
+  }
+
+  if (VALID_KEYS.includes(key)) {
+    localStorage.setItem('kal_license', key);
+    document.getElementById('login-overlay').style.display = 'none';
+    err.textContent = '';
+  } else {
+    err.textContent = 'Chave inválida. Verifique e tente novamente.';
+    input.style.borderColor = '#e05c5c';
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+  }
+
+  btn.textContent = 'Entrar';
+  btn.disabled = false;
+}
+
+document.getElementById('license-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+(function() {
+  const saved = localStorage.getItem('kal_license');
+  if (saved && VALID_KEYS.includes(normalizeKey(saved))) {
+    document.getElementById('login-overlay').style.display = 'none';
+  }
+})();
+
+</script>
+</body>
+</html>
