@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compra confirmada — Kal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0f0e11;
+    color: #f0ece8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    background-image: radial-gradient(ellipse at 20% 10%, rgba(201,168,76,0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 80%, rgba(76,175,125,0.05) 0%, transparent 50%);
+  }
+  .box {
+    background: #1a1820;
+    border: 1px solid #2e2a38;
+    border-radius: 20px;
+    padding: 40px 28px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: #e8c97e;
+    margin-bottom: 8px;
+  }
+  .check {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #e8c97e;
+    margin-bottom: 20px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid #2e2a38;
+    margin: 20px 0;
+  }
+  p {
+    font-size: 0.9rem;
+    color: #b8b0c0;
+    line-height: 1.8;
+    margin-bottom: 14px;
+  }
+  p strong { color: #f0ece8; }
+  .highlight {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    color: #e8c97e;
+    line-height: 1.6;
+    margin: 20px 0;
+  }
+  .footer {
+    font-size: 0.72rem;
+    color: #7a7385;
+    margin-top: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">✦ Kal</div>
+  <span class="check">✅</span>
+  <h1>Compra confirmada!</h1>
+  <hr class="divider">
+  <p>Obrigado por adquirir o <strong>Kal</strong>! Seu link de acesso personalizado será enviado em até <strong>24 horas</strong> no email que você cadastrou na compra.</p>
+  <div class="highlight">
+    🔗 Guarde bem o link quando receber — ele é <strong>exclusivo seu</strong> e dá acesso direto ao app sem precisar de senha.
+  </div>
+  <p>Qualquer dúvida é só responder o email de confirmação da compra.</p>
+  <div class="footer">✦ Kal — Controle Financeiro · Tarefas · Notas</div>
+</div>
+</body>
+</html>
